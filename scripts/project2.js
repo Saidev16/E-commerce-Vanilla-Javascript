@@ -147,12 +147,22 @@ function addToCartFunc(){
 		var price = productSelected.getElementsByClassName('prix')[0].innerText;
 		var imageSrc = productSelected.getElementsByTagName('img')[0].src ;
 		var quantity = productSelected.getElementsByTagName('input')[0].value ;
-		console.log(title,price, imageSrc, quantity);
+		
+		// If statement to not add the product to the card if the quantity is 0
+		if(quantity >= 1){
 		createAddedProduct(title,price,imageSrc,quantity)  // Send all these data to the function that will set it
+		}else{
+			return false;
+		}
+		searchFilter()
+
+
 	};
 
 	// the function that will build all the blocks for the product added
 	function createAddedProduct(title,price,imageSrc,quantity){
+
+		
 		// build the div element for product
 		var card = document.createElement("div");
 		card.className = "achat";
@@ -181,10 +191,78 @@ function addToCartFunc(){
 
 		// Get the parent div which have the 'achats ' class
 		var achatsElem = document.getElementsByClassName('achats')[0]
+
+		// check if the item is already exists on the card 
+		var cardItems = document.getElementsByClassName('achats')[0];
+		var cardItemTitles = cardItems.getElementsByTagName('h4')
+		for(var i=0; i<cardItemTitles.length;i++){
+			if(cardItemTitles[i].innerText== title){
+				alert('the item already exists on the card')
+				return
+			}
+		}
+
+
 		// Append the block to the parent element 
 		achatsElem.appendChild(card);
+		removeItem()
+		updatePrice()
+		
+	}
+	//Function that removes the item from the card
+	function removeItem(){
+		var removeCardItem = document.getElementsByClassName('retirer')
+		for(var i=0; i<removeCardItem.length ; i++){
+			var button = removeCardItem[i];
+			button.addEventListener('click',function(event){
+				var buttonClicked = event.target
+				buttonClicked.parentElement.parentElement.remove() ;
+				updatePrice()
+			})
+		}
+		
+	}
+
+	// the function that update the price 
+	function updatePrice(){
+		var itemsAddedBlock = document.getElementsByClassName('achats')[0];
+		var cardItems = itemsAddedBlock.getElementsByClassName('achat');
+		var total = 0 ;
+		for(var i =0; i< cardItems.length; i++){
+			var cardItem = cardItems[i];
+			var priceItem = cardItem.getElementsByClassName('prix')[0].innerText;
+			var itemQuantity = cardItem.getElementsByClassName('quantite')[0].innerText;
+			total = total + parseFloat(priceItem*itemQuantity)
+			
+		}
+		document.getElementById('montant').innerText = '$'+ total;
+	}
+
+	// search filter function 
+	function searchFilter(){
+		var searchBar = document.getElementById('filter');
+		var cardItems = document.getElementsByClassName('achats')[0];
+		var cardItem = document.getElementsByClassName('achat');
+		var cardItemTitles = cardItems.getElementsByTagName('h4');
+		var a;
+		var textValue;
+		//console.log(cardItemTitles[1])
+		searchBar.addEventListener('keyup',function(e){
+			var term = e.target.value.toLowerCase() ;
+			for(var i =0; i< cardItemTitles.length; i++){
+				txtValue = cardItemTitles[i].innerText;
+				//textValue = a.innerText;				
+				if (txtValue.toLowerCase().indexOf(term) > -1) {
+					cardItem[i].style.display = "";
+				  } else {
+					cardItem[i].style.display = "none";
+				  }
+			}			
+
+		})
 	}
 	
-
+	
 }
+
 
